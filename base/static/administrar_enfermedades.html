@@ -1,0 +1,43 @@
+{% extends "starter.html" %}
+{% load staticfiles %}
+{% block css %}
+ 
+  <style type="text/css">
+  	.imagen{
+  		width: 50px;
+		height: 50px;
+  	}
+  </style>
+{% endblock %}
+
+{% block menu %}
+<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>General</h3>
+                <ul class="nav side-menu">
+
+                  <li class="active"><a href="{% url 'administrar' %}"><i class="fa fa-home"></i> Enfermedades</a>
+                  </li>
+
+                  <li ><a href="{% url 'dianostico' %}"><i class="fa  fa-heartbeat"></i> Diagnóstico</a>
+                  </li>
+
+                </ul>
+              </div>
+            </div>
+{% endblock %}
+{% block main %}
+<div class="page-title">
+              <div class="title_left">
+                <h3>Administración de enfermedades</h3>
+              </div>
+            </div>
+{% endblock %}
+{% block js %}
+<!-- Datateble -->
+    <script src="{% static 'vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript">
+    	
+    </script>
+{% endblock %}
