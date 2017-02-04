@@ -5,3 +5,5 @@ from base.models import *
 admin.site.register(Enfermedad)
 admin.site.register(SignoGeneral)
 admin.site.register(SignoCaracteristico)
+admin.site.register(EnfermedadSignoGeneral)
+admin.site.register(EnfermedadSignoCaracteristico)

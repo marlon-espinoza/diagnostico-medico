@@ -7,6 +7,20 @@
   		width: 50px;
 		height: 50px;
   	}
+    .ancho-total{
+      width: 100%;
+    }
+    .pagination li {
+      display:inline-block;
+      padding:5px;
+    }
+    .center_div{
+        margin: 0 auto;
+        width:80% /* value of your choice which suits your alignment */
+    }
+    .fondo-celeste{
+      background-color: #f7f7f7;
+    }
   </style>
 {% endblock %}
 
@@ -19,7 +33,7 @@
                   <li ><a href="{% url 'administrar' %}"><i class="fa fa-home"></i> Enfermedades</a>
                   </li>
 
-                  <li class="active"><a href="{% url 'dianostico' %}"><i class=" fa-heartbeat"></i> Diagnóstico</a>
+                  <li class="active"><a href="{% url 'dianostico' %}"><i class="fa fa-heartbeat"></i> Diagnóstico</a>
                   </li>
 
                 </ul>
@@ -27,17 +41,71 @@
             </div>
 {% endblock %}
 {% block main %}
-<div class="page-title">
-              <div class="title_left">
-                <h3>Diagnóstico médico</h3>
+
+<div class="page-title col-md-12">
+    <div class="title_left">
+      <h3>Diagnóstico médico</h3>
+    </div>
+</div>
+
+<div class=" container center_div">
+  <div class="row">
+    <div class="col-md-6 panel panel-default">
+      <div class="box-body">
+
+      <div class="panel-heading">
+          <h3>Síntomas</h3>
+      </div>
+
+        <div id="test-list" class="panel-body ">
+        
+            <div class="panel-group checkbox list ">
+
+            {% for signo in signos_generales %} 
+            <label class="ancho-total ">
+              <input type="checkbox" value="{{signo.identificador}}">
+
+              <div class="panel panel-default">
+                <a data-toggle="collapse" href="#{{signo.identificador}}">
+                  <div class="panel-heading fondo-celeste">
+                    <h4 class="panel-title">
+                      {{signo.nombre}}
+                    </h4>
+                  </div>
+                </a>
+                <div id="{{signo.identificador}}" class="panel-collapse collapse">
+                  <div class="panel-body">{{signo.explicacion}}</div>
+                </div>
+
               </div>
+
+            </label>
+
+            {% endfor %} 
+            
             </div>
+            <ul class="pagination"></ul>
+        </div>
+        <div >
+  </div>
+  <button type="button" class="btn btn-success col-md-12">Hacer diagnóstico</button>
+  </div>
+    </div>
+
+  </div>
+  
+
+</div>
 {% endblock %}
 {% block js %}
 <!-- Datateble -->
-    <script src="{% static 'vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
-    <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/list/list.js' %}"></script>
     <script type="text/javascript">
-    	
+      var monkeyList = new List('test-list', {
+        valueNames: ['name'],
+        page: 10,
+        pagination: true
+      });
     </script>
+
 {% endblock %}

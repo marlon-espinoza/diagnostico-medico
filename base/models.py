@@ -9,20 +9,36 @@ class Enfermedad(models.Model):
 	casusas = models.TextField(null=True,blank=True)
 	tratamiento = models.TextField(null=True,blank=True)
 
+	def __unicode__(self):
+		return self.nombre
+
 
 class SignoGeneral(models.Model):
+	identificador = models.CharField(max_length=30,unique=True)
 	nombre = models.CharField(max_length=150)
 	explicacion = models.TextField(null=True,blank=True)
 
+	def __unicode__(self):
+		return self.nombre
+
 class SignoCaracteristico(models.Model):
+	identificador = models.CharField(max_length=30,unique=True)
 	nombre = models.CharField(max_length=150)
 	explicacion = models.TextField(null=True,blank=True)
 	pregunta = models.CharField(max_length=150)
+
+	def __unicode__(self):
+		return self.nombre
 
 class EnfermedadSignoGeneral(models.Model):
 	enfermedad = models.ForeignKey(Enfermedad)
 	signo_general = models.ForeignKey(SignoGeneral)
 
+	def __unicode__(self):
+		return self.enfermedad.nombre + " - " + self.signo_general.nombre
 class EnfermedadSignoCaracteristico(models.Model):
 	enfermedad = models.ForeignKey(Enfermedad)
 	signo_caracteristico = models.ForeignKey(SignoCaracteristico)
+	
+	def __unicode__(self):
+		return self.enfermedad.nombre + " - " + self.signo_caracteristico.nombre
