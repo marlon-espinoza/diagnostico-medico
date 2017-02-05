@@ -4,10 +4,18 @@
 
 ; Gastritis
 (defrule 
-	gastritis (signo distencion-abdominal) (signo dispepsias)(signo flatulencias)(signo dolor-abdominal)
+	gastritis (signo astenia) 
 =>
 	(python-call add_enfermedad 1 gastritis)
 	(printout t gastritis crlf)
+)
+
+; Gastritis 2 de prueba
+(defrule 
+	gastritis2 (signo distencion-abdominal) (signo dispepsias)(signo dolor-abdominal)
+=>
+	(python-call add_enfermedad 4 gastritis4)
+	(printout t gastritis4 crlf)
 )
 
 (defrule 
@@ -20,6 +28,6 @@
 (defrule 
 	enteritis (signo diarrea) (signo distencion-abdominal)(signo deshidratacion)(signo astenia)
 =>
-	(python-call add_enfermedad 3 gastritis)
+	(python-call add_enfermedad 3 enteritis)
 	(printout t enteritis crlf)
 )

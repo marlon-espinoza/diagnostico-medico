@@ -21,6 +21,9 @@
     .fondo-celeste{
       background-color: #f7f7f7;
     }
+    .oculto{
+      display: none;
+    }
   </style>
 {% endblock %}
 
@@ -40,16 +43,25 @@
               </div>
             </div>
 {% endblock %}
+{% block titulo %}Diagnóstico médico{% endblock %}
 {% block main %}
+<div class="resultados oculto col-md-12 panel panel-default">
+      <div class="box-body">
 
-<div class="page-title col-md-12">
-    <div class="title_left">
-      <h3>Diagnóstico médico</h3>
-    </div>
+      <div class="panel-heading">
+          <h3>Posibles enfermedades</h3>
+      </div>
+
+        <div class="panel-body ">
+       </div>
+       <!-- <div class="oculto panel-footer "> -->
+       <div class="panel-footer "> <!-- Cambiar etapa de pruebas -->
+          <button id="dianostico-final" type="button" class="btn btn-info" onclick="diagnosticoFinal()">Diagnóstico final</button>
+       </div>
+
+      </div>
+
 </div>
-
-<div class=" container center_div">
-  <div class="row">
     <div class="col-md-6 panel panel-default">
       <div class="box-body">
 
@@ -58,23 +70,30 @@
       </div>
 
         <div id="test-list" class="panel-body ">
-        
+          <div class="col-md-6 col-sm-6 col-xs-12 form-group pull-right top_search">
+                  <div class="input-group">
+                    <input type="text" class="form-control search" placeholder="Buscar síntoma...">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+                  </div>
+                </div>
             <div class="panel-group checkbox list ">
 
             {% for signo in signos_generales %} 
             <label class="ancho-total ">
-              <input type="checkbox" value="{{signo.identificador}}">
+              <input type="checkbox" id="sintoma_{{signo.pk}}" value="{{signo.nombre}}" class="selecciones" name="{{signo.pk}}">
 
               <div class="panel panel-default">
                 <a data-toggle="collapse" href="#{{signo.identificador}}">
                   <div class="panel-heading fondo-celeste">
-                    <h4 class="panel-title">
+                    <h4 class="panel-title signo">
                       {{signo.nombre}}
                     </h4>
                   </div>
                 </a>
                 <div id="{{signo.identificador}}" class="panel-collapse collapse">
-                  <div class="panel-body">{{signo.explicacion}}</div>
+                  <div class="panel-body sintoma">{{signo.explicacion}}</div>
                 </div>
 
               </div>
@@ -88,24 +107,126 @@
         </div>
         <div >
   </div>
-  <button type="button" class="btn btn-success col-md-12">Hacer diagnóstico</button>
+  <button type="button" class="btn btn-success col-md-12" onclick="diagnostico()">Hacer diagnóstico</button>
   </div>
     </div>
 
-  </div>
-  
 
+    <div class="col-md-6 panel panel-default">
+      <div class="box-body">
+
+      <div class="panel-heading">
+          <h3>Síntomas seleccionados</h3>
+      </div>
+
+        <div id="lista-sintomas" class="panel-body ">
+          
+            
+        </div>
+        
+      </div>
+  </div>
+
+  <!-- Modal resultado de diagnóstico -->
+<div id="posibles_enfermedades" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Posibles enfermedades</h4>
+      </div>
+      <div class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button onclick="respuestaNo()" type="button" class="btn btn-success">No</button>
+        <button onclick="respuestaSi()" type="button" class="btn btn-danger">Sí</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 {% endblock %}
 {% block js %}
 <!-- Datateble -->
     <script src="{% static 'js/list/list.js' %}"></script>
     <script type="text/javascript">
-      var monkeyList = new List('test-list', {
-        valueNames: ['name'],
+    var preguntas_finales;
+    var step = 0;
+    var num_pregunta = 0;
+    var resultados = {};
+
+    var monkeyList = new List('test-list', {
+        valueNames: ['signo','sintoma'],
         page: 10,
         pagination: true
       });
+
+    function quitarSintoma( id_sintoma ){
+        if($('#'+id_sintoma).is(":checked")){
+          $('#'+id_sintoma).attr("checked", false);
+          $('#boton_'+id_sintoma).remove();
+        }
+    }
+      
+    $('.selecciones').change(function() {
+        if($(this).is(":checked")) {
+            $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
+        } else{
+          $('#boton_'+$(this).attr('id')).remove();
+        }   
+    });
+    function diagnostico(){
+      var sintomas = [];
+      $('.checkbox input:checked').each(function() {
+          sintomas.push($(this).attr('name'));
+      });
+      $.ajax({
+          url: "{% url 'posibles_enfermedades'%}",
+          type: "post",
+          data: "&csrfmiddlewaretoken={{csrf_token }}&sintomas[]="+ sintomas,
+          success : function(data) {
+              step = 0;
+              resultados = {};
+              console.log(data);
+              var lista = data.lista;
+              preguntas_finales = data.signos_caracteristicos;
+              if(data!=0){
+                $(".resultados .panel-body").html("");
+                for(key in lista){
+                  $(".resultados .panel-body").append("<p>"+lista[key]+"</p>");
+                  $('.resultados .panel-footer').removeClass( "oculto" );
+
+                }
+                $('#dianostico-final').removeClass( "oculto" );
+              }else{
+                $(".resultados .panel-body").html("No hay suficiente información");
+                // $('.resultados .panel-footer').addClass( "oculto" );<!-- Cambiar etapa de pruebas -->
+              }
+              $('.resultados').removeClass( "oculto" );
+              
+              
+          }
+      })
+
+    }
+    function diagnosticoFinal(){
+      var id_enfermedad = Object.keys(preguntas_finales)[step];
+      console.log(preguntas_finales[id_enfermedad]);
+      var enfermedad = preguntas_finales[id_enfermedad][0];
+      
+      $("#posibles_enfermedades .modal-title").html("Posible enfermedad: "+enfermedad);
+      $("#posibles_enfermedades .modal-body").html(preguntas_finales[id_enfermedad][num_pregunta+1]);
+      $("#posibles_enfermedades").modal('show');
+    }
+    function respuestaNo(){
+
+    }
+    function respuestaSi(){
+      
+    }
     </script>
 
 {% endblock %}
