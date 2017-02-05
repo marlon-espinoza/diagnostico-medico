@@ -11,7 +11,6 @@ class Diagnostico(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(Diagnostico, self).get_context_data(**kwargs)
 		signos_gen = SignoGeneral.objects.all()
-		print signos_gen
 		context['signos_generales'] = signos_gen
 		return context
 
@@ -19,4 +18,6 @@ class Administrar(TemplateView):
 	template_name = 'administrar_enfermedades.html'
 	def get_context_data(self, **kwargs):
 		context = super(Administrar, self).get_context_data(**kwargs)
+		signos_gen = SignoGeneral.objects.all()
+		context['signos_generales'] = signos_gen
 		return context
