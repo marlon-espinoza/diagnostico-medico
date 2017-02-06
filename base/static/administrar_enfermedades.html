@@ -1,12 +1,18 @@
 {% extends "starter.html" %}
 {% load staticfiles %}
 {% block css %}
- 
+
   <style type="text/css">
   	.imagen{
   		width: 50px;
 		height: 50px;
   	}
+    .ancho-total{
+      width: 100%;
+    }
+    .input {
+        display: block;
+    }
   </style>
 {% endblock %}
 
@@ -27,17 +33,128 @@
             </div>
 {% endblock %}
 {% block main %}
-<div class="page-title">
-              <div class="title_left">
-                <h3>Administración de enfermedades</h3>
-              </div>
+
+            <div class="col-md-6 panel panel-default">
+              <form id="formEnfermedades">
+                <div class="form-group">
+                 <label for="comment">Código:</label>
+                 <input type="text" class="form-control ">
+                </div>
+                <div class="form-group">
+                 <label for="comment">Nombre:</label>
+                 <input type="text" class="form-control ">
+                </div>
+                <div class="form-group">
+                 <label for="comment">Causas:</label>
+                 <textarea class="form-control" rows="5" id="causas"></textarea>
+                </div>
+                <div class="form-group">
+                 <label for="comment">Tratamiento:</label>
+                 <textarea class="form-control" rows="5" id="tratamiento"></textarea>
+                </div>
+                <label for="comment">Síntomas:</label>
+                <div id="lista-sintomas" class="form-group"></div>
+                <label for="comment">Preguntas Seleccionadas:</label>
+                <div id="listaPreguntasSeleccionadas" class="form-group"></div>
+                <button id="btnPregunta" type="button" class="btn btn-default" onclick="addField()">Añadir pregunta..</button>
+                <div id="listaPreguntas" class="form-group"></div>
+
+              </form>
+
+
+
             </div>
+
+            <div class="col-md-6 panel panel-default">
+              <div class="box-body">
+
+              <div class="panel-heading">
+                  <h3>Síntomas</h3>
+              </div>
+
+                <div id="test-list" class="panel-body ">
+
+                    <div class="panel-group checkbox list ">
+
+                      {% for signo in signos_generales %}
+                      <label class="ancho-total ">
+                        <input type="checkbox" id="sintoma_{{signo.pk}}" value="{{signo.nombre}}" class="selecciones" name="{{signo.pk}}">
+
+                        <div class="panel panel-default">
+                          <a data-toggle="collapse" href="#{{signo.identificador}}">
+                            <div class="panel-heading fondo-celeste">
+                              <h4 class="panel-title signo">
+                                {{signo.nombre}}
+                              </h4>
+                            </div>
+                          </a>
+                          <div id="{{signo.identificador}}" class="panel-collapse collapse">
+                            <div class="panel-body sintoma">{{signo.explicacion}}</div>
+                          </div>
+
+                        </div>
+
+                      </label>
+
+                      {% endfor %}
+
+                    </div>
+                    <ul class="pagination"></ul>
+                </div>
+
+                </div>
+            </div>
+
 {% endblock %}
 {% block js %}
 <!-- Datateble -->
-    <script src="{% static 'vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
-    <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/list/list.js' %}"></script>
     <script type="text/javascript">
-    	
+    var monkeyList = new List('test-list', {
+        valueNames: ['signo','sintoma'],
+        page: 10,
+        pagination: true
+      });
+
+      $('.selecciones').change(function() {
+          if($(this).is(":checked")) {
+              $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
+          } else{
+            $('#boton_'+$(this).attr('id')).remove();
+          }
+      });
+
+      function quitarSintoma( id_sintoma ){
+          if($('#'+id_sintoma).is(":checked")){
+            $('#'+id_sintoma).attr("checked", false);
+            $('#boton_'+id_sintoma).remove();
+          }
+      }
+
+
+      var myBtn = document.getElementById('btnPregunta');
+
+
+      var form = document.getElementById('listaPreguntas');
+
+      function addField() {
+        $("#listaPreguntas").append('<textarea class="form-control" rows="5" id="tratamiento"></textarea>');
+        $("#listaPreguntas").append('<button type="button" id="aceptarBtn" onclick="aceptar()" class="btn btn-success pull-right">Aceptar</button>');
+        $("#listaPreguntas").append('<button type="button" id="cancelarBtn" onclick="cancelar()" class="btn btn-danger pull-right">Cancelar</button>');
+
+            $('#btnPregunta').prop("disabled",true);
+
+      }
+
+      function cancelar(){
+        $('#btnPregunta').prop("disabled",false);
+        $("#listaPreguntas").empty();
+      }
+
+      function aceptar(){
+        $("#listaPreguntasSeleccionadas").append('<button id="preguntaPropBtn" type="button" class="btn btn-default">Pregunta</button>');
+        $('#btnPregunta').prop("disabled",false);
+        $("#listaPreguntas").empty();
+      }
     </script>
 {% endblock %}

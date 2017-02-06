@@ -5,7 +5,7 @@ from base.models import *
 import clips
 import json
 #from base.forms import *
-# Clase 
+# Clase
 class Enfermedades:
 	lista = {}
 	def __init__ (self):
@@ -20,7 +20,6 @@ class Diagnostico(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(Diagnostico, self).get_context_data(**kwargs)
 		signos_gen = SignoGeneral.objects.all()
-		print signos_gen
 		context['signos_generales'] = signos_gen
 		return context
 
@@ -28,7 +27,10 @@ class Administrar(TemplateView):
 	template_name = 'administrar_enfermedades.html'
 	def get_context_data(self, **kwargs):
 		context = super(Administrar, self).get_context_data(**kwargs)
+		signos_gen = SignoGeneral.objects.all()
+		context['signos_generales'] = signos_gen
 		return context
+
 
 def posiblesEnfermedades(request):
 	if request.method == 'POST':
@@ -48,7 +50,7 @@ def posiblesEnfermedades(request):
 			except Exception as e:
 				print e
 				return HttpResponse(0)
-			
+
 		clips.Run()
 		t = clips.StdoutStream.Read()
 		print t	
@@ -57,6 +59,7 @@ def posiblesEnfermedades(request):
 		# un arreglo con el nombre y las preguntas
 		preguntas = {"1":["fibrosis","preguna 1","pregunta 2"], "2":["horror","preguna 1","pregunta 2"]}
 		respuesta = {"lista":e.lista,"preguntas":preguntas}
+
 		if len(e.lista):
 			return HttpResponse(json.dumps(respuesta),content_type='application/json')
 		else:
