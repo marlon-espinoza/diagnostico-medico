@@ -128,6 +128,7 @@ def guardarEnfermedad(request):
 		sintomas = ast.literal_eval(form["sintomas"])
 		print sintomas
 		preguntas = ast.literal_eval(form["preguntas"])
+		print preguntas
 		str_asserts = ""
 		clips.Load("posibles-enfermedades.clp")
 		try:
@@ -154,6 +155,7 @@ def guardarEnfermedad(request):
 			clips.Save("posibles-enfermedades.clp")
 		except Exception as e:
 			print e
+			enfermedad.delete()
 			return HttpResponse(0)
 		
 

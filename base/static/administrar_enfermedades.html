@@ -218,10 +218,15 @@
                           processData: false
                       })
                           .done(function(res){
+                            if(res!=0){
                               alert("Guadado exitoso");
                               window.location.href = "{% url 'ver_enfermedad' id=12345 %}".replace(/12345/, res);
-                              
+                            }
+                            else{
+                              alert("Ocurrió un error");
+                              }
                           });
+                            
                   }else{
                       alert("Hay campos vacíos que son requeridos");
                   }
