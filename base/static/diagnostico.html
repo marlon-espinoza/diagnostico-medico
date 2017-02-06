@@ -127,9 +127,9 @@
       </div>
   </div>
 
-  <!-- Modal resultado de diagnóstico -->
-<div id="posibles_enfermedades" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <!-- Modal diagnóstico final -->
+<div id="diagnostico_final" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-sm">
 
     <!-- Modal content-->
     <div class="modal-content">
@@ -141,8 +141,29 @@
 
       </div>
       <div class="modal-footer">
-        <button onclick="respuestaNo()" type="button" class="btn btn-success">No</button>
-        <button onclick="respuestaSi()" type="button" class="btn btn-danger">Sí</button>
+        <button type="button" class="respuesta-no btn btn-success pull-left">No</button>
+        <button type="button" class="respuesta-si btn btn-danger">Sí</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal resultado final de diagnóstico -->
+<div id="resultados_medicos" class="modal" role="dialog">
+  <div class="modal-dialog modal-sm">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Resultados</h4>
+      </div>
+      <div class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" data-dismiss="modal">Aceptar</button>
       </div>
     </div>
 
@@ -154,9 +175,9 @@
     <script src="{% static 'js/list/list.js' %}"></script>
     <script type="text/javascript">
     var preguntas_finales;
-    var step = 0;
-    var num_pregunta = 0;
-    var resultados = {};
+    var index_posible_enfermedad = 0; //Esta variable es el índice de la enfermedad que se está examinando
+    var num_pregunta = 1; //Las preguntas se cuentan a partir de 1 porque el primer elemento de la lista de preguntas es el nombre de la enfermedad
+    var resultados = {};//Los resultados contienen el id de la enfermedad, el nombre, y estado:'descartado', 'no-examinado', 'confirmado'
 
     var monkeyList = new List('test-list', {
         valueNames: ['signo','sintoma'],
@@ -188,16 +209,25 @@
           type: "post",
           data: "&csrfmiddlewaretoken={{csrf_token }}&sintomas[]="+ sintomas,
           success : function(data) {
-              step = 0;
+              index_posible_enfermedad = 0;
               resultados = {};
-              console.log(data);
-              var lista = data.lista;
-              preguntas_finales = data.signos_caracteristicos;
+              
               if(data!=0){
+                // Si es diferente de cero es porque retornó información
+                console.log(data);
+                // almacena un dict con los id de las enfermedades como keys y el codigo de la enfermedad como value
+                // pero deberia ser el nombre [CORREGIR]
+                var lista = data.lista;
+                // preguntas_finales contiene como key el id de las enfermedades y en cada value
+                // un arreglo con el nombre de la enfermedad y las preguntas
+                preguntas_finales = data.preguntas;
+
                 $(".resultados .panel-body").html("");
                 for(key in lista){
                   $(".resultados .panel-body").append("<p>"+lista[key]+"</p>");
                   $('.resultados .panel-footer').removeClass( "oculto" );
+                  // resultados almacena el id como key y el nombre de la enfermedad con su estado
+                  resultados[key] = {'enfermedad':lista[key],'estado':'no-examinado'};
 
                 }
                 $('#dianostico-final').removeClass( "oculto" );
@@ -207,25 +237,119 @@
               }
               $('.resultados').removeClass( "oculto" );
               
-              
           }
       })
 
     }
+
     function diagnosticoFinal(){
-      var id_enfermedad = Object.keys(preguntas_finales)[step];
+      // Obtiene el id de la primera enfermedad en la lista
+      var id_enfermedad = Object.keys(preguntas_finales)[index_posible_enfermedad];
       console.log(preguntas_finales[id_enfermedad]);
+      // Obtiene el nombre de la primera enfermedad
       var enfermedad = preguntas_finales[id_enfermedad][0];
       
-      $("#posibles_enfermedades .modal-title").html("Posible enfermedad: "+enfermedad);
-      $("#posibles_enfermedades .modal-body").html(preguntas_finales[id_enfermedad][num_pregunta+1]);
-      $("#posibles_enfermedades").modal('show');
+      $("#diagnostico_final .modal-title").html("Posible enfermedad: "+enfermedad);
+      $("#diagnostico_final .modal-body").html(preguntas_finales[id_enfermedad][num_pregunta]);
+      $("#diagnostico_final").modal('show');
+      // Se añaden a los botones de si o no las funciones con el id de la enfermedad actual que se está examinando
+      $(".respuesta-no").attr("onclick","respuestaNo("+id_enfermedad+");");
+      $(".respuesta-si").attr("onclick","respuestaSi("+id_enfermedad+");");
     }
-    function respuestaNo(){
+
+    function respuestaNo(id_enfermedad){
+        // El estado de la enfermedad actual (que se está examinando) cambia a "descartado"
+        resultados[id_enfermedad]["estado"] = "descartado";
+        // Se pasa a la siguiente enfermedad si es que hay
+        index_posible_enfermedad ++;
+        // Se inicializa la variable a la primera pregunta a evaluar
+        num_pregunta = 1;
+        if(Object.keys(preguntas_finales)[index_posible_enfermedad]==undefined){
+          // Si es undefined llegó a la última pregunta y debe devoler la respuesta
+          respuesta();
+        }else{
+          // Sino se llama a la siguiente pregunta con el id de la siguiente enfermedad
+          siguientePregunta(Object.keys(preguntas_finales)[index_posible_enfermedad]);
+        }
 
     }
-    function respuestaSi(){
-      
+    function respuestaSi(id_enfermedad){
+        if (num_pregunta+1 >= preguntas_finales[id_enfermedad].length) {
+          //si ya no hay más preguntas de la misma enfermedad
+          console.log(id_enfermedad);
+          console.log(resultados[id_enfermedad]);
+          num_pregunta = 1;
+          //se mueve el índice a la siguiente posible enfermedad
+          index_posible_enfermedad++;
+          //y el estado de la enfermedad examinada cambia a confirmado
+          resultados[id_enfermedad]["estado"] = "confirmado";
+          // falta validar si hay más enfermedades a examinar para pasar a la siguiente pregunta o para
+          //arrojar el resutlado final
+          if(Object.keys(preguntas_finales)[index_posible_enfermedad]==undefined){
+          // Si es undefined llegó a la última pregunta y debe devoler la respuesta
+            respuesta();
+          }else{
+            // Sino se llama a la siguiente pregunta con el id de la siguiente enfermedad
+            siguientePregunta(Object.keys(preguntas_finales)[index_posible_enfermedad]);
+          }
+
+        } else{
+            //se pasa a la siguiente pregunta
+            num_pregunta++;
+            siguientePregunta(id_enfermedad);
+        }
+    }
+    function siguientePregunta(id_enfermedad){
+        var enfermedad = preguntas_finales[id_enfermedad][0];
+        $("#diagnostico_final .modal-title").html("Posible enfermedad: "+enfermedad);
+        $("#diagnostico_final .modal-body").html(preguntas_finales[id_enfermedad][num_pregunta]);
+        $(".respuesta-no").attr("onclick","respuestaNo("+id_enfermedad+");");
+        $(".respuesta-si").attr("onclick","respuestaSi("+id_enfermedad+");");
+       
+    }
+    function respuesta(){
+      index_posible_enfermedad=0;
+      index_posible_enfermedad = 0; 
+      num_pregunta = 1;
+      $('#diagnostico_final').modal('toggle');
+      verResultados();
+
+    }
+    function verResultados(){
+      var enfermedades_id = [];
+      for (key in resultados) {
+        if (resultados[key]['estado'] == "confirmado"){
+          enfermedades_id.push(key);
+        }
+
+      }
+      $.ajax({
+          url: "{% url 'resultado_medico'%}",
+          type: "post",
+          data: "&csrfmiddlewaretoken={{csrf_token }}&enfermedades[]="+ enfermedades_id,
+          success : function(data) {
+              var l = Object.keys(data).length
+              var enfermedades = data;
+              console.log(enfermedades);
+              var str_html = "";
+              var cont = 0;
+              if (l>1) str_html = "<p>El resultado de su diagnóstico es el siguiente </p><p>Usted padece las siguientes enfermedades</p><hr>";
+              else str_html = "<p>El resultado de su diagnóstico es el siguiente </p><hr>";
+              for (key in enfermedades) {
+                cont++;
+                var nombre = enfermedades[key]['nombre'];
+                var causas = enfermedades[key]['causas'];
+                var tratamiento = enfermedades[key]['tratamiento'];
+                str_html += "<p><strong>Enfermedad: </strong></p><p>"+nombre+"</p>";
+                if (causas!="") str_html += "<p><strong>Causas de la enfermedad: </strong></p><p>"+causas+"</p>";
+                if (tratamiento!="") str_html += "<p><strong>Tratamiento: </strong></p><p>"+tratamiento+"</p>";
+                
+                if (l>1 && cont < l) str_html+="<hr>";
+              }
+              $('#resultados_medicos .modal-body').html(str_html);
+              $('#resultados_medicos').modal('show');
+          }
+      })
     }
     </script>
 

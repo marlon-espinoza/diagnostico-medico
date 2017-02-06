@@ -10,8 +10,8 @@ class Enfermedades:
 	lista = {}
 	def __init__ (self):
 		self.lista = {}
-	def add_enfermedad(self,cod , nombre):
-		self.lista[str(cod)] = str(nombre)
+	def add_enfermedad(self,id , codigo):
+		self.lista[str(id)] = str(codigo)
 
 
 # Create your views here.
@@ -53,9 +53,29 @@ def posiblesEnfermedades(request):
 		t = clips.StdoutStream.Read()
 		print t	
 		print e.lista	
-		signos_car = {"1":["enfermedad 1","preguna 1","pregunta 2"], "2":["enfermedad 2","preguna 1","pregunta 2"]}
-		respuesta = {"lista":e.lista,"signos_caracteristicos":signos_car}
+		# Las  preguntas se pasan por un dict que contiene como key el id de las enfermedades y en cada value
+		# un arreglo con el nombre y las preguntas
+		preguntas = {"1":["fibrosis","preguna 1","pregunta 2"], "2":["horror","preguna 1","pregunta 2"]}
+		respuesta = {"lista":e.lista,"preguntas":preguntas}
 		if len(e.lista):
 			return HttpResponse(json.dumps(respuesta),content_type='application/json')
 		else:
 			return HttpResponse(0)
+
+def resultadoMedico(request):
+	if request.method == 'POST':
+		enfermedades_id = request.POST.getlist("enfermedades[]")
+		enfermedades = {}
+
+		# for enfermedad_id in enfermedades_id:
+		# 	try:
+		# 		enfermedad = Enfermedad.objects.get(pk=enfermedad_id)
+		# 		print enfermedad
+		# 		enfermedades[enfermedad.pk]={'nombre': enfermedad.nombre, 'causas': enfermedad.casusas, 'tratamiento': enfermedad.tratamiento}
+		# 	except Exception as e:
+		# 		print e
+		# 		return HttpResponse(0)
+		enfermedades['1']={'nombre': 'Fibrosis', 'causas': 'Mucho alcohol', 'tratamiento': 'tomar agua'}
+
+		return HttpResponse(json.dumps(enfermedades),content_type='application/json')
+
