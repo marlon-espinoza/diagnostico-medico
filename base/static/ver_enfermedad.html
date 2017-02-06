@@ -21,8 +21,29 @@
     .fondo-celeste{
       background-color: #f7f7f7;
     }
+    .fondo-rojo{
+      background-color: #fdbfbf;
+    }
+    .fondo-gainsboro{
+      background-color: gainsboro;
+    }
     .oculto{
       display: none;
+    }
+    .table-user-information > tbody > tr {
+        border-top: 1px solid rgb(221, 221, 221);
+    }
+
+    .table-user-information > tbody > tr:first-child {
+        border-top: 0;
+    }
+
+
+    .table-user-information > tbody > tr > td {
+        border-top: 0;
+    }
+    .toppad
+    {margin-top:20px;
     }
   </style>
 {% endblock %}
@@ -33,138 +54,113 @@
                 <h3>General</h3>
                 <ul class="nav side-menu">
 
-                  <li ><a href="{% url 'administrar' %}"><i class="fa fa-home"></i> Enfermedades</a>
+                  <li class="active"><a href="{% url 'administrar' %}"><i class="fa fa-home"></i> Enfermedades</a>
                   </li>
 
-                  <li class="active"><a href="{% url 'dianostico' %}"><i class="fa fa-heartbeat"></i> Diagnóstico</a>
+                  <li ><a href="{% url 'dianostico' %}"><i class="fa fa-heartbeat"></i> Diagnóstico</a>
                   </li>
 
                 </ul>
               </div>
             </div>
 {% endblock %}
-{% block titulo %}Diagnóstico médico{% endblock %}
+{% block dirs%}
+        <section class="content-header pull-right">
+      
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+      </ol>
+    </section>
+    {% endblock %}
 {% block main %}
-<div class="resultados oculto col-md-12 panel panel-default">
-      <div class="box-body">
 
-      <div class="panel-heading">
-          <h3>Posibles enfermedades</h3>
-      </div>
-
-        <div class="panel-body ">
-       </div>
-       <!-- <div class="oculto panel-footer "> -->
-       <div class="panel-footer "> <!-- Cambiar etapa de pruebas -->
-          <button id="dianostico-final" type="button" class="btn btn-info" onclick="diagnosticoFinal()">Diagnóstico final</button>
-       </div>
-
-      </div>
-
-</div>
-    <div class="col-md-6 panel panel-default">
-      <div class="box-body">
-
-      <div class="panel-heading">
-          <h3>Síntomas</h3>
-      </div>
-
-        <div id="test-list" class="panel-body ">
-          <div class="col-md-6 col-sm-6 col-xs-12 form-group pull-right top_search">
-                  <div class="input-group">
-                    <input type="text" class="form-control search" placeholder="Buscar síntoma...">
-                    <span class="input-group-btn">
-                      <button class="btn btn-default" type="button">Go!</button>
-                    </span>
-                  </div>
-                </div>
-            <div class="panel-group checkbox list ">
-
-            {% for signo in signos_generales %} 
-            <label class="ancho-total ">
-              <input type="checkbox" id="sintoma_{{signo.pk}}" value="{{signo.nombre}}" class="selecciones" name="{{signo.pk}}">
-
-              <div class="panel panel-default">
-                <a data-toggle="collapse" href="#{{signo.identificador}}">
-                  <div class="panel-heading fondo-celeste">
-                    <h4 class="panel-title signo">
-                      {{signo.nombre}}
-                    </h4>
-                  </div>
-                </a>
-                <div id="{{signo.identificador}}" class="panel-collapse collapse">
-                  <div class="panel-body sintoma">{{signo.explicacion}}</div>
-                </div>
-
-              </div>
-
-            </label>
-
-            {% endfor %} 
+<div class="container">
+      <div class="row">
+    
+        <div class="" >
+   
+   
+          <div class="panel panel-info">
             
+            <div class="panel-heading">
+              <h3 class="panel-title">ENFERMEDAD</h3>
             </div>
-            <ul class="pagination"></ul>
+            <div class="panel-body">
+              <div class="row">
+                <div class=" col-md-6 "> 
+                  <table class="table table-user-information">
+                    <tbody>
+                      <tr>
+                        <td>Enfermedad:</td>
+                        <td>{{enfermedad.nombre}}</td>
+                      </tr>
+                      <tr>
+                        <td>Código:</td>
+                        <td>{{enfermedad.codigo}}</td>
+                      </tr>
+                      <tr>
+                        <td>Causas:</td>
+                        <td>{{enfermedad.causas}}</td>
+                      </tr>
+                      <tr>
+                        <td>Tratamiento:</td>
+                        <td>{{enfermedad.tratamiento}}</td>
+                      </tr>
+                    </tbody>
+                  </table>                  
+                  </div>
+                   <div class="col-md-6"> 
+                      <label for="sintoma">Síntomas:</label>
+
+                        {% for sintoma in sintomas %}
+                        <div class="panel panel-default ">
+                          <a data-toggle="collapse" href="#sintoma_{{sintoma.pk}}">
+                            <div class="panel-heading fondo-rojo">
+                              <h4 class="panel-title signo">
+                                {{sintoma.signo_general.nombre}}
+                              </h4>
+                            </div>
+                          </a>
+                          <div id="sintoma_{{sintoma.pk}}" class="panel-collapse collapse">
+                            <div class="panel-body pregunta">
+                            {{sintoma.signo_general.explicacion}}
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}
+
+
+                        <label for="sintoma">Preguntas de síntomas característicos:</label>
+                        {% for pregunta in preguntas %}
+                        <div class="panel panel-default">
+                          <a data-toggle="collapse" href="#pregunta_{{pregunta.pk}}">
+                            <div class="panel-heading fondo-gainsboro">
+                              <h4 class="panel-title signo">
+                                Pregunta {{forloop.counter}}
+                              </h4>
+                            </div>
+                          </a>
+                          <div id="pregunta_{{pregunta.pk}}" class="panel-collapse collapse">
+                            <div class="panel-body pregunta">
+                            {{pregunta.pregunta}}
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}
+          </div>
         </div>
-        <div >
-  </div>
-  <button type="button" class="btn btn-success col-md-12" onclick="diagnostico()">Hacer diagnóstico</button>
-  </div>
-    </div>
-
-
-    <div class="col-md-6 panel panel-default">
-      <div class="box-body">
-
-      <div class="panel-heading">
-          <h3>Síntomas seleccionados</h3>
-      </div>
-
-        <div id="lista-sintomas" class="panel-body ">
-          
-            
-        </div>
-        
-      </div>
-  </div>
-
-  <!-- Modal diagnóstico final -->
-<div id="diagnostico_final" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-sm">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Posibles enfermedades</h4>
-      </div>
-      <div class="modal-body">
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="respuesta-no btn btn-success pull-left">No</button>
-        <button type="button" class="respuesta-si btn btn-danger">Sí</button>
       </div>
     </div>
-
-  </div>
+    </div>
+    </div>
 </div>
-
-
 {% endblock %}
 {% block js %}
 <!-- Datateble -->
     <script src="{% static 'js/list/list.js' %}"></script>
     <script type="text/javascript">
-    var preguntas_finales;
-    var index_posible_enfermedad = 0; //Esta variable es el índice de la enfermedad que se está examinando
-    var num_pregunta = 1; //Las preguntas se cuentan a partir de 1 porque el primer elemento de la lista de preguntas es el nombre de la enfermedad
-    var resultados = {};//Los resultados contienen el id de la enfermedad, el nombre, y estado:'descartado', 'no-examinado', 'confirmado'
 
-    var monkeyList = new List('test-list', {
-        valueNames: ['signo','sintoma'],
-        page: 10,
-        pagination: true
-      });
 
     
     </script>

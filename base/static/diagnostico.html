@@ -44,6 +44,8 @@
             </div>
 {% endblock %}
 {% block titulo %}Diagnóstico médico{% endblock %}
+{% block dirs%}
+    {% endblock %}
 {% block main %}
 <div class="resultados oculto col-md-12 panel panel-default">
       <div class="box-body">
@@ -71,13 +73,13 @@
 
         <div id="test-list" class="panel-body ">
           <div class="col-md-6 col-sm-6 col-xs-12 form-group pull-right top_search">
-                  <div class="input-group">
-                    <input type="text" class="form-control search" placeholder="Buscar síntoma...">
-                    <span class="input-group-btn">
-                      <button class="btn btn-default" type="button">Go!</button>
-                    </span>
-                  </div>
-                </div>
+            <div class="input-group">
+              <input type="text" class="form-control search" placeholder="Buscar síntoma...">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Go!</button>
+              </span>
+            </div>
+          </div>
             <div class="panel-group checkbox list ">
 
             {% for signo in signos_generales %} 
@@ -178,7 +180,13 @@
     var index_posible_enfermedad = 0; //Esta variable es el índice de la enfermedad que se está examinando
     var num_pregunta = 1; //Las preguntas se cuentan a partir de 1 porque el primer elemento de la lista de preguntas es el nombre de la enfermedad
     var resultados = {};//Los resultados contienen el id de la enfermedad, el nombre, y estado:'descartado', 'no-examinado', 'confirmado'
-
+    $('.selecciones').change(function() {
+        if($(this).is(":checked")) {
+            $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg" data="`+$(this).attr('name')+`" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
+        } else{
+          $('#boton_'+$(this).attr('id')).remove();
+        }   
+    });
     var monkeyList = new List('test-list', {
         valueNames: ['signo','sintoma'],
         page: 10,
@@ -192,17 +200,11 @@
         }
     }
       
-    $('.selecciones').change(function() {
-        if($(this).is(":checked")) {
-            $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
-        } else{
-          $('#boton_'+$(this).attr('id')).remove();
-        }   
-    });
+    
     function diagnostico(){
       var sintomas = [];
-      $('.checkbox input:checked').each(function() {
-          sintomas.push($(this).attr('name'));
+      $(".signo_seleccionado").each(function() {
+          sintomas.push($(this).attr('data'));
       });
       $.ajax({
           url: "{% url 'posibles_enfermedades'%}",

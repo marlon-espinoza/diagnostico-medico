@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponse
+from django.http import Http404
 from base.models import *
 import clips
 import json, ast
@@ -29,6 +30,24 @@ class Administrar(TemplateView):
 		context = super(Administrar, self).get_context_data(**kwargs)
 		signos_gen = SignoGeneral.objects.all()
 		context['signos_generales'] = signos_gen
+		return context
+
+class VerEnfermedad(TemplateView):
+	template_name = 'ver_enfermedad.html'
+	def get_context_data(self, **kwargs):
+		context = super(VerEnfermedad, self).get_context_data(**kwargs)
+		idEnfermedad = kwargs.get('id')
+		try:
+			e = Enfermedad.objects.get(pk=idEnfermedad)
+			signos_gen = EnfermedadSignoGeneral.objects.filter(enfermedad=e).order_by('-pk')
+			pregs = PreguntaEnfermedad.objects.filter(enfermedad=e).order_by('pk')
+			print signos_gen
+			print pregs
+			context['enfermedad'] = e
+			context['sintomas'] = signos_gen
+			context['preguntas'] = pregs
+		except Exception as e:
+			raise Http404
 		return context
 
 
@@ -138,4 +157,4 @@ def guardarEnfermedad(request):
 			return HttpResponse(0)
 		
 
-		return HttpResponse(1)
+		return HttpResponse(enfermedad.pk)
