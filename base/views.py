@@ -3,15 +3,15 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse
 from base.models import *
 import clips
-import json
+import json, ast
 #from base.forms import *
 # Clase
 class Enfermedades:
 	lista = {}
 	def __init__ (self):
 		self.lista = {}
-	def add_enfermedad(self,id , codigo):
-		self.lista[str(id)] = str(codigo)
+	def add_enfermedad(self,id , nombre):
+		self.lista[str(id)] = str(nombre)
 
 
 # Create your views here.
@@ -38,6 +38,7 @@ def posiblesEnfermedades(request):
 		sintomas_id = sintomas_id[0].split(',')
 		signos_car = {}
 		respuesta = {}
+		preguntas = {}
 		e = Enfermedades()
 		clips.RegisterPythonFunction(e.add_enfermedad)
 		clips.Load("posibles-enfermedades.clp")
@@ -52,12 +53,24 @@ def posiblesEnfermedades(request):
 				return HttpResponse(0)
 
 		clips.Run()
-		t = clips.StdoutStream.Read()
-		print t	
-		print e.lista	
+
+		for key in e.lista:
+			try:
+				enfermedad = Enfermedad.objects.get(pk=key)
+				p = PreguntaEnfermedad.objects.filter(enfermedad=enfermedad)
+				array_preguntas = []
+				array_preguntas.append(enfermedad.nombre)
+				for pregunta in p:
+					array_preguntas.append(pregunta.pregunta)
+
+				preguntas[key] = array_preguntas
+			except Exception as ex:
+				print ex
+				return HttpResponse(0)
+				
 		# Las  preguntas se pasan por un dict que contiene como key el id de las enfermedades y en cada value
 		# un arreglo con el nombre y las preguntas
-		preguntas = {"1":["fibrosis","preguna 1","pregunta 2"], "2":["horror","preguna 1","pregunta 2"]}
+
 		respuesta = {"lista":e.lista,"preguntas":preguntas}
 
 		if len(e.lista):
@@ -67,18 +80,62 @@ def posiblesEnfermedades(request):
 
 def resultadoMedico(request):
 	if request.method == 'POST':
-		enfermedades_id = request.POST.getlist("enfermedades[]")
+		print request.POST.get("enfermedades")
+		enfermedades_id = ast.literal_eval(request.POST.get("enfermedades"))
+		print enfermedades_id
 		enfermedades = {}
 
-		# for enfermedad_id in enfermedades_id:
-		# 	try:
-		# 		enfermedad = Enfermedad.objects.get(pk=enfermedad_id)
-		# 		print enfermedad
-		# 		enfermedades[enfermedad.pk]={'nombre': enfermedad.nombre, 'causas': enfermedad.casusas, 'tratamiento': enfermedad.tratamiento}
-		# 	except Exception as e:
-		# 		print e
-		# 		return HttpResponse(0)
-		enfermedades['1']={'nombre': 'Fibrosis', 'causas': 'Mucho alcohol', 'tratamiento': 'tomar agua'}
+		for enfermedad_id in enfermedades_id:
+			try:
+				enfermedad = Enfermedad.objects.get(pk=enfermedad_id)
+				print enfermedad
+				enfermedades[enfermedad.pk]={'nombre': enfermedad.nombre, 'causas': enfermedad.causas, 'tratamiento': enfermedad.tratamiento}
+			except Exception as e:
+				print e
+				return HttpResponse(0)
+		# enfermedades['1']={'nombre': 'Fibrosis', 'causas': 'Mucho alcohol', 'tratamiento': 'tomar agua'}
 
 		return HttpResponse(json.dumps(enfermedades),content_type='application/json')
 
+def guardarEnfermedad(request):
+	if request.method == 'POST':
+		sintomas = []
+		preguntas = []
+		form = request.POST
+		nombre = request.POST.get("nombre")
+		codigo = request.POST.get("codigo").replace(" ","")
+		causas = request.POST.get("causas")
+		tratamiento = request.POST.get("tratamiento")
+		sintomas = ast.literal_eval(form["sintomas"])
+		print sintomas
+		preguntas = ast.literal_eval(form["preguntas"])
+		str_asserts = ""
+		clips.Load("posibles-enfermedades.clp")
+		try:
+			enfermedad = Enfermedad(codigo=codigo,nombre=nombre,causas=causas,tratamiento=tratamiento)
+			enfermedad.save()
+
+			for id_sintoma in sintomas:
+				print id_sintoma
+				sintoma = SignoGeneral.objects.get(pk=id_sintoma)
+				print sintoma
+				e = EnfermedadSignoGeneral(signo_general=sintoma,enfermedad=enfermedad)
+				e.save()
+				str_asserts+= "(signo "+sintoma.identificador+" )"
+			print "aqui no se cae"
+			for pregunta in preguntas:
+				p = PreguntaEnfermedad(enfermedad=enfermedad,pregunta=pregunta)
+				p.save()
+			print "aqui no se cae"
+			clips.Build("""
+				(defrule """+enfermedad.codigo+" "+str_asserts+"""
+				=>
+				(python-call add_enfermedad """+str(enfermedad.pk)+" \""+enfermedad.nombre+"\")"+"""
+				)""")
+			clips.Save("posibles-enfermedades.clp")
+		except Exception as e:
+			print e
+			return HttpResponse(0)
+		
+
+		return HttpResponse(1)

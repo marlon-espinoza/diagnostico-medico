@@ -6,4 +6,5 @@ urlpatterns = [
    	url(r'^administrar/$', base.views.Administrar.as_view(),name="administrar"),   	
    	url(r'^posibles_enfermedades/$', base.views.posiblesEnfermedades,name="posibles_enfermedades"),   
    	url(r'^resultado_medico/$', base.views.resultadoMedico,name="resultado_medico"),   
+   	url(r'^guardar_enfermedad/$', base.views.guardarEnfermedad,name="guardar_enfermedad"), 
    	]

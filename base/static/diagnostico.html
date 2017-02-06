@@ -151,7 +151,7 @@
 
 <!-- Modal resultado final de diagnóstico -->
 <div id="resultados_medicos" class="modal" role="dialog">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog">
 
     <!-- Modal content-->
     <div class="modal-content">
@@ -232,8 +232,10 @@
                 }
                 $('#dianostico-final').removeClass( "oculto" );
               }else{
-                $(".resultados .panel-body").html("No hay suficiente información");
-                // $('.resultados .panel-footer').addClass( "oculto" );<!-- Cambiar etapa de pruebas -->
+                $(".resultados .panel-body").html("");
+                $(".resultados .panel-body").append("<p>No hay suficiente información</p>");
+
+                $('.resultados .panel-footer').addClass( "oculto" );// Cambiar etapa de pruebas
               }
               $('.resultados').removeClass( "oculto" );
               
@@ -326,7 +328,7 @@
       $.ajax({
           url: "{% url 'resultado_medico'%}",
           type: "post",
-          data: "&csrfmiddlewaretoken={{csrf_token }}&enfermedades[]="+ enfermedades_id,
+          data: "&csrfmiddlewaretoken={{csrf_token }}&enfermedades="+JSON.stringify(enfermedades_id),
           success : function(data) {
               var l = Object.keys(data).length
               var enfermedades = data;

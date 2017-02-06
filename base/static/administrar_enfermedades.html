@@ -32,38 +32,52 @@
               </div>
             </div>
 {% endblock %}
+{% block titulo %}Administrador médico{% endblock %}
 {% block main %}
 
-            <div class="col-md-6 panel panel-default">
-              <form id="formEnfermedades">
-                <div class="form-group">
-                 <label for="comment">Código:</label>
-                 <input type="text" class="form-control ">
-                </div>
-                <div class="form-group">
-                 <label for="comment">Nombre:</label>
-                 <input type="text" class="form-control ">
-                </div>
-                <div class="form-group">
-                 <label for="comment">Causas:</label>
-                 <textarea class="form-control" rows="5" id="causas"></textarea>
-                </div>
-                <div class="form-group">
-                 <label for="comment">Tratamiento:</label>
-                 <textarea class="form-control" rows="5" id="tratamiento"></textarea>
-                </div>
-                <label for="comment">Síntomas:</label>
-                <div id="lista-sintomas" class="form-group"></div>
-                <label for="comment">Preguntas Seleccionadas:</label>
-                <div id="listaPreguntasSeleccionadas" class="form-group"></div>
-                <button id="btnPregunta" type="button" class="btn btn-default" onclick="addField()">Añadir pregunta..</button>
-                <div id="listaPreguntas" class="form-group"></div>
+<div class="col-md-6 panel panel-default">
+      <div class="box-body">
 
+            <div class="panel-heading">
+                <h3>Agregar nueva enfermedad</h3>
+            </div>
+
+              <form id="formEnfermedades">{% csrf_token %}
+                <div class="form-group">
+                 <label for="codigo">Código:</label>
+                 <input name="codigo" type="text" class="form-control ">
+                </div>
+                <div class="form-group">
+                 <label for="nombre">Nombre:</label>
+                 <input name="nombre" type="text" class="form-control " >
+                </div>
+                <div class="form-group">
+                 <label for="causas">Causas:</label>
+                 <textarea name="causas" class="form-control" rows="5" id="causas"></textarea>
+                </div>
+                <div class="form-group">
+                 <label for="tratamiento">Tratamiento:</label>
+                 <textarea name="tratamiento" class="form-control" rows="5" id="tratamiento"></textarea>
+                </div>
+
+                <label for="sintoma">Síntomas:</label>
+                <div id="lista-sintomas" class="form-group"></div>
+
+                 <div name="sintomas" id="lista-sintomas" class="form-group">
+                <button id="btnPregunta" type="button" class="btn btn-default pull-right" onclick="addPregunta()">Añadir pregunta</button>
+                <label for="preguntas">Preguntas Seleccionadas:</label>
+                </div>
+
+                <div id="listaPreguntasSeleccionadas" class="form-group"></div>
+
+                <div id="areaPregunta" class="form-group"></div>
+                <button type="submit"" class="btn btn-success col-md-12">Guardar</button>
               </form>
 
 
 
             </div>
+</div>
 
             <div class="col-md-6 panel panel-default">
               <div class="box-body">
@@ -104,7 +118,6 @@
 
                 </div>
             </div>
-
 {% endblock %}
 {% block js %}
 <!-- Datateble -->
@@ -115,6 +128,7 @@
         page: 10,
         pagination: true
       });
+    var num_preg = 0;
 
       $('.selecciones').change(function() {
           if($(this).is(":checked")) {
@@ -132,15 +146,10 @@
       }
 
 
-      var myBtn = document.getElementById('btnPregunta');
-
-
-      var form = document.getElementById('listaPreguntas');
-
-      function addField() {
-        $("#listaPreguntas").append('<textarea class="form-control" rows="5" id="tratamiento"></textarea>');
-        $("#listaPreguntas").append('<button type="button" id="aceptarBtn" onclick="aceptar()" class="btn btn-success pull-right">Aceptar</button>');
-        $("#listaPreguntas").append('<button type="button" id="cancelarBtn" onclick="cancelar()" class="btn btn-danger pull-right">Cancelar</button>');
+      function addPregunta() {
+        $("#areaPregunta").append('<textarea class="form-control" rows="5" id="pregunta_nueva"></textarea>');
+        $("#areaPregunta").append('<button type="button" id="aceptarBtn" onclick="aceptar()" class="btn btn-success pull-right">Aceptar</button>');
+        $("#areaPregunta").append('<button type="button" id="cancelarBtn" onclick="cancelar()" class="btn btn-danger pull-right">Cancelar</button>');
 
             $('#btnPregunta').prop("disabled",true);
 
@@ -148,13 +157,82 @@
 
       function cancelar(){
         $('#btnPregunta').prop("disabled",false);
-        $("#listaPreguntas").empty();
+        $("#areaPregunta").empty();
       }
 
       function aceptar(){
-        $("#listaPreguntasSeleccionadas").append('<button id="preguntaPropBtn" type="button" class="btn btn-default">Pregunta</button>');
+        num_preg++;
+        $("#listaPreguntasSeleccionadas").append(`<div class="panel panel-default">
+                <a data-toggle="collapse" href="#pregunta`+num_preg+`">
+                  <div class="panel-heading fondo-celeste">
+                    <h4 class="panel-title signo">
+                      Pregunta `+num_preg+`
+                    </h4>
+                  </div>
+                </a>
+                <div id="pregunta`+num_preg+`" class="panel-collapse collapse">
+                  <div class="panel-body pregunta">`+$('#pregunta_nueva').val()+`</div>
+                </div>
+
+              </div>`);
         $('#btnPregunta').prop("disabled",false);
-        $("#listaPreguntas").empty();
+        $("#areaPregunta").empty();
       }
+
+      $(function(){
+              $("#formEnfermedades").on("submit", function(e){
+                console.log("Entra");
+                  e.preventDefault();
+                  var formData = new FormData(document.getElementById("formEnfermedades"));
+                  var sintomas = [];
+                  var preguntas = [];
+                  $('.checkbox input:checked').each(function() {
+                      sintomas.push($(this).attr('name'));
+                  });
+                  $('.pregunta').each(function() {
+                      preguntas.push($(this).html());
+                  });
+                  console.log(sintomas);
+                  console.log(preguntas);
+                  formData.append("sintomas", JSON.stringify(sintomas));
+                  formData.append("preguntas", JSON.stringify(preguntas));
+                  //formData.append(f.attr("name"), $(this)[0].files[0]);
+                  if(validarCampos(formData)){
+                      $.ajax({
+                          url: "{% url 'guardar_enfermedad'%}",
+                          type: "post",
+                          data: formData,
+                          cache: false,
+                          contentType: false,
+                          processData: false
+                      })
+                          .done(function(res){
+                              alert(res);
+                          });
+                  }else{
+                      alert("Hay campos vacíos que son requeridos");
+                  }
+                  
+              });
+        });
+      // Valida solamente que los campos no sean vacíos
+      function validarCampos(formData){
+          for (var pair of formData.entries()) {
+            if(pair[0]=="codigo")
+              if(pair[1].replace(" ", "")=="" || pair[1]==undefined )return false;
+            if(pair[0]=="nombre")
+              if(pair[1].replace(" ", "")=="" || pair[1]==undefined )return false;
+            if(pair[0]=="sintomas"){
+              console.log(pair[1]);
+              if(pair[1]=="[]" || pair[1]==undefined )return false;
+            }
+            if(pair[0]=="preguntas"){
+              console.log(pair[1]);
+              if(pair[1]=="[]" || pair[1]==undefined )return false;
+            }
+          }
+          return true;
+      }
+
     </script>
 {% endblock %}

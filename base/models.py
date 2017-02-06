@@ -13,7 +13,7 @@ class TipoEnfermedad(models.Model):
 class Enfermedad(models.Model):
 	codigo = models.CharField(max_length=30,null=True,blank=True)
 	nombre = models.CharField(max_length=30)
-	casusas = models.TextField(null=True,blank=True)
+	causas = models.TextField(null=True,blank=True)
 	tratamiento = models.TextField(null=True,blank=True)
 	tipo_enfermedad = models.ForeignKey(TipoEnfermedad,null=True)
 
