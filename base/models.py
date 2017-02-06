@@ -43,6 +43,3 @@ class EnfermedadSignoGeneral(models.Model):
 
 	def __unicode__(self):
 		return self.enfermedad.nombre + " - " + self.signo_general.nombre
-
-
-
