@@ -57,8 +57,8 @@
                 <label for="comment">Preguntas Seleccionadas:</label>
                 <div id="listaPreguntasSeleccionadas" class="form-group"></div>
                 <button id="btnPregunta" type="button" class="btn btn-default" onclick="addField()">Añadir pregunta..</button>
-                <div id="listaPreguntas" class="form-group">
-                </div>
+                <div id="listaPreguntas" class="form-group"></div>
+
               </form>
 
 
@@ -139,11 +139,22 @@
 
       function addField() {
         $("#listaPreguntas").append('<textarea class="form-control" rows="5" id="tratamiento"></textarea>');
-        $("#listaPreguntas").append('<button type="button" class="btn btn-success pull-right">Aceptar</button>');
-        $("#listaPreguntas").append('<button type="button" class="btn btn-danger pull-right">Cancelar</button>');
+        $("#listaPreguntas").append('<button type="button" id="aceptarBtn" onclick="aceptar()" class="btn btn-success pull-right">Aceptar</button>');
+        $("#listaPreguntas").append('<button type="button" id="cancelarBtn" onclick="cancelar()" class="btn btn-danger pull-right">Cancelar</button>');
 
             $('#btnPregunta').prop("disabled",true);
-        
+
+      }
+
+      function cancelar(){
+        $('#btnPregunta').prop("disabled",false);
+        $("#listaPreguntas").empty();
+      }
+
+      function aceptar(){
+        $("#listaPreguntasSeleccionadas").append('<button id="preguntaPropBtn" type="button" class="btn btn-default">Pregunta</button>');
+        $('#btnPregunta').prop("disabled",false);
+        $("#listaPreguntas").empty();
       }
     </script>
 {% endblock %}
