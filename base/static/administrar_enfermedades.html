@@ -33,8 +33,9 @@
             </div>
 {% endblock %}
 {% block titulo %}Administrador médico{% endblock %}
+{% block dirs%}
+    {% endblock %}
 {% block main %}
-
 <div class="col-md-6 panel panel-default">
       <div class="box-body">
 
@@ -87,7 +88,14 @@
               </div>
 
                 <div id="test-list" class="panel-body ">
-
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group pull-right top_search">
+                      <div class="input-group">
+                        <input type="text" class="form-control search" placeholder="Buscar síntoma...">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button">Go!</button>
+                        </span>
+                      </div>
+                    </div>
                     <div class="panel-group checkbox list ">
 
                       {% for signo in signos_generales %}
@@ -123,6 +131,15 @@
 <!-- Datateble -->
     <script src="{% static 'js/list/list.js' %}"></script>
     <script type="text/javascript">
+
+    $('.selecciones').change(function() {
+          if($(this).is(":checked")) {
+              $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg signo_seleccionado" data="`+$(this).attr('name')+`" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
+          } else{
+            $('#boton_'+$(this).attr('id')).remove();
+          }
+      });
+
     var monkeyList = new List('test-list', {
         valueNames: ['signo','sintoma'],
         page: 10,
@@ -130,13 +147,7 @@
       });
     var num_preg = 0;
 
-      $('.selecciones').change(function() {
-          if($(this).is(":checked")) {
-              $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
-          } else{
-            $('#boton_'+$(this).attr('id')).remove();
-          }
-      });
+      
 
       function quitarSintoma( id_sintoma ){
           if($('#'+id_sintoma).is(":checked")){
@@ -186,8 +197,8 @@
                   var formData = new FormData(document.getElementById("formEnfermedades"));
                   var sintomas = [];
                   var preguntas = [];
-                  $('.checkbox input:checked').each(function() {
-                      sintomas.push($(this).attr('name'));
+                  $(".signo_seleccionado").each(function() {
+                      sintomas.push($(this).attr('data'));
                   });
                   $('.pregunta').each(function() {
                       preguntas.push($(this).html());
@@ -207,8 +218,15 @@
                           processData: false
                       })
                           .done(function(res){
-                              alert(res);
+                            if(res!=0){
+                              alert("Guadado exitoso");
+                              window.location.href = "{% url 'ver_enfermedad' id=12345 %}".replace(/12345/, res);
+                            }
+                            else{
+                              alert("Ocurrió un error");
+                              }
                           });
+                            
                   }else{
                       alert("Hay campos vacíos que son requeridos");
                   }
@@ -233,6 +251,5 @@
           }
           return true;
       }
-
     </script>
 {% endblock %}

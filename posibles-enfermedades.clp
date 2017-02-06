@@ -10,3 +10,11 @@
    =>
    (python-call add_enfermedad 7 "Hepatitis"))
 
+(defrule MAIN::colera
+   (signo cinetosis)
+   (signo fatiga)
+   (signo disnea)
+   (signo coluria)
+   =>
+   (python-call add_enfermedad 8 "Colera"))
+
