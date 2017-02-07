@@ -182,7 +182,7 @@
     var resultados = {};//Los resultados contienen el id de la enfermedad, el nombre, y estado:'descartado', 'no-examinado', 'confirmado'
     $('.selecciones').change(function() {
         if($(this).is(":checked")) {
-            $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg" data="`+$(this).attr('name')+`" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
+            $("#lista-sintomas").append(`<button id="boton_`+$(this).attr('id')+`" type="button" data-toggle="tooltip" data-placement="top" title="Borrar" class="btn btn-default btn-lg signo_seleccionado" data="`+$(this).attr('name')+`" onclick="quitarSintoma('`+$(this).attr('id')+`')">`+$(this).val()+`</button>`);
         } else{
           $('#boton_'+$(this).attr('id')).remove();
         }   
@@ -206,10 +206,11 @@
       $(".signo_seleccionado").each(function() {
           sintomas.push($(this).attr('data'));
       });
+      console.log(sintomas);
       $.ajax({
           url: "{% url 'posibles_enfermedades'%}",
           type: "post",
-          data: "&csrfmiddlewaretoken={{csrf_token }}&sintomas[]="+ sintomas,
+          data: "&csrfmiddlewaretoken={{csrf_token }}&sintomas="+JSON.stringify(sintomas),
           success : function(data) {
               index_posible_enfermedad = 0;
               resultados = {};

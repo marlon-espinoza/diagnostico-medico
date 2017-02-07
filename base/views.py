@@ -53,8 +53,8 @@ class VerEnfermedad(TemplateView):
 
 def posiblesEnfermedades(request):
 	if request.method == 'POST':
-		sintomas_id = request.POST.getlist("sintomas[]")
-		sintomas_id = sintomas_id[0].split(',')
+		sintomas_id = ast.literal_eval( request.POST.get("sintomas"))
+		print sintomas_id
 		signos_car = {}
 		respuesta = {}
 		preguntas = {}

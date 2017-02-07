@@ -10,7 +10,6 @@
    =>
    (python-call add_enfermedad 7 "Hepatitis"))
 
-<<<<<<< HEAD
 (defrule MAIN::apendicitis
    (signo colicosAbdominales)
    (signo cinetosis)
@@ -57,13 +56,5 @@
    (signo inapetencia)
    =>
    (python-call add_enfermedad 16 "Anemia"))
-=======
-(defrule MAIN::colera
-   (signo cinetosis)
-   (signo fatiga)
-   (signo disnea)
-   (signo coluria)
-   =>
-   (python-call add_enfermedad 8 "Colera"))
->>>>>>> d325955581cd5c82ab2a793aefbc7200b86502f8
+
 
