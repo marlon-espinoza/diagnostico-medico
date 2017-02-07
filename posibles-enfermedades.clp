@@ -4,12 +4,6 @@
    =>
    (python-call add_enfermedad 6 "Gastritis"))
 
-(defrule MAIN::hepatitis
-   (signo colicosAbdominales)
-   (signo fiebre)
-   =>
-   (python-call add_enfermedad 7 "Hepatitis"))
-
 (defrule MAIN::apendicitis
    (signo colicosAbdominales)
    (signo cinetosis)
@@ -57,4 +51,48 @@
    =>
    (python-call add_enfermedad 16 "Anemia"))
 
+(defrule MAIN::enteritis
+   (signo diarrea)
+   (signo miastenia)
+   (signo distensionAbdominal)
+   =>
+   (python-call add_enfermedad 19 "Enteritis"))
+
+(defrule MAIN::ulcera
+   (signo inapetencia)
+   (signo cinetosis)
+   (signo emesis)
+   =>
+   (python-call add_enfermedad 27 "Ulcera"))
+
+(defrule MAIN::hepatitis
+   (signo colicosAbdominales)
+   (signo diarrea)
+   (signo somnolencia)
+   =>
+   (python-call add_enfermedad 28 "Hepatitis"))
+
+(defrule MAIN::neumonia
+   (signo tosFlema)
+   (signo fiebre)
+   (signo escalofrio)
+   (signo miaglias)
+   (signo dolorArticular)
+   (signo fatiga)
+   (signo dolorToracico)
+   =>
+   (python-call add_enfermedad 29 "Neumonia"))
+
+(defrule MAIN::tuberculosis
+   (signo fatiga)
+   (signo dolorToracico)
+   (signo diaforesis)
+   =>
+   (python-call add_enfermedad 30 "Tuberculosis"))
+
+(defrule MAIN::cancerDeEstomago
+   (signo diarrea)
+   (signo inapetencia)
+   =>
+   (python-call add_enfermedad 32 "Cancer de Estomago"))
 
