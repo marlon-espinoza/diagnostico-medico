@@ -1,9 +1,3 @@
-(defrule MAIN::gastritis
-   (signo astenia)
-   (signo somnolencia)
-   =>
-   (python-call add_enfermedad 6 "Gastritis"))
-
 (defrule MAIN::apendicitis
    (signo colicosAbdominales)
    (signo cinetosis)
@@ -95,4 +89,29 @@
    (signo inapetencia)
    =>
    (python-call add_enfermedad 32 "Cancer de Estomago"))
+
+(defrule MAIN::embolia
+   (signo cefalea)
+   (signo cinetosis)
+   (signo espasticidad)
+   (signo entumecimiento)
+   =>
+   (python-call add_enfermedad 33 "Embolia arterial"))
+
+(defrule MAIN::estenosis_mitral
+   (signo tosFlema)
+   (signo fatiga)
+   (signo infeccionesRespiratorias)
+   (signo dolorToracico)
+   =>
+   (python-call add_enfermedad 34 "Estenosis mitral"))
+
+(defrule MAIN::valvuloplastia_cardiaca
+   (signo fatiga)
+   (signo astenia)
+   (signo cinetosis)
+   (signo dolorToracico)
+   (signo disnea)
+   =>
+   (python-call add_enfermedad 65 "Valvulopatía cardiaca"))
 

@@ -36,7 +36,7 @@
 {% block dirs%}
     {% endblock %}
 {% block main %}
-<div class="col-md-6 panel panel-default">
+<div class="col-md-6 col-sm-12 panel panel-default">
       <div class="box-body">
 
             <div class="panel-heading">
@@ -80,7 +80,7 @@
             </div>
 </div>
 
-            <div class="col-md-6 panel panel-default">
+            <div class="col-md-6 col-sm-12 panel panel-default">
               <div class="box-body">
 
               <div class="panel-heading">
@@ -205,6 +205,7 @@
                   });
                   console.log(sintomas);
                   console.log(preguntas);
+                  
                   formData.append("sintomas", JSON.stringify(sintomas));
                   formData.append("preguntas", JSON.stringify(preguntas));
                   //formData.append(f.attr("name"), $(this)[0].files[0]);

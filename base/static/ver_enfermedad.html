@@ -88,7 +88,7 @@
             </div>
             <div class="panel-body">
               <div class="row">
-                <div class=" col-md-6 "> 
+                <div class=" col-md-6 col-sm-12"> 
                   <table class="table table-user-information">
                     <tbody>
                       <tr>
@@ -110,11 +110,11 @@
                     </tbody>
                   </table>                  
                   </div>
-                   <div class="col-md-6"> 
+                   <div class="col-md-6 col-sm-12"> 
                       <label for="sintoma">Síntomas:</label>
 
                         {% for sintoma in sintomas %}
-                        <div class="panel panel-default ">
+                        <div class="panel panel-default ancho-total">
                           <a data-toggle="collapse" href="#sintoma_{{sintoma.pk}}">
                             <div class="panel-heading fondo-rojo">
                               <h4 class="panel-title signo">
@@ -133,7 +133,7 @@
 
                         <label for="sintoma">Preguntas de síntomas característicos:</label>
                         {% for pregunta in preguntas %}
-                        <div class="panel panel-default">
+                        <div class="panel panel-default ancho-total">
                           <a data-toggle="collapse" href="#pregunta_{{pregunta.pk}}">
                             <div class="panel-heading fondo-gainsboro">
                               <h4 class="panel-title signo">

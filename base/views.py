@@ -5,6 +5,9 @@ from django.http import Http404
 from base.models import *
 import clips
 import json, ast
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 #from base.forms import *
 # Clase
 class Enfermedades:
@@ -72,17 +75,20 @@ def posiblesEnfermedades(request):
 				return HttpResponse(0)
 
 		clips.Run()
-
+		print e.lista
 		for key in e.lista:
 			try:
-				enfermedad = Enfermedad.objects.get(pk=key)
-				p = PreguntaEnfermedad.objects.filter(enfermedad=enfermedad)
-				array_preguntas = []
-				array_preguntas.append(enfermedad.nombre)
-				for pregunta in p:
-					array_preguntas.append(pregunta.pregunta)
+				enfermedad = Enfermedad.objects.filter(pk=key)
+				print enfermedad
+				if len(enfermedad):
+					enfermedad = enfermedad[0]
+					p = PreguntaEnfermedad.objects.filter(enfermedad=enfermedad)
+					array_preguntas = []
+					array_preguntas.append(enfermedad.nombre)
+					for pregunta in p:
+						array_preguntas.append(pregunta.pregunta)
 
-				preguntas[key] = array_preguntas
+					preguntas[key] = array_preguntas
 			except Exception as ex:
 				print ex
 				return HttpResponse(0)
@@ -122,13 +128,16 @@ def guardarEnfermedad(request):
 		preguntas = []
 		form = request.POST
 		nombre = request.POST.get("nombre")
+		
 		codigo = request.POST.get("codigo").replace(" ","")
+		print codigo
+		print type(codigo)
 		causas = request.POST.get("causas")
 		tratamiento = request.POST.get("tratamiento")
 		sintomas = ast.literal_eval(form["sintomas"])
-		print sintomas
-		preguntas = ast.literal_eval(form["preguntas"])
-		print preguntas
+		p = form["preguntas"].encode('UTF-8', 'replace')
+		preguntas = ast.literal_eval(p)
+		print type(preguntas)
 		str_asserts = ""
 		clips.Load("posibles-enfermedades.clp")
 		try:
@@ -144,6 +153,9 @@ def guardarEnfermedad(request):
 				str_asserts+= "(signo "+sintoma.identificador+" )"
 			print "aqui no se cae"
 			for pregunta in preguntas:
+				print pregunta
+				print type(pregunta)
+
 				p = PreguntaEnfermedad(enfermedad=enfermedad,pregunta=pregunta)
 				p.save()
 			print "aqui no se cae"

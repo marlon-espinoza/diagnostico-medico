@@ -15,7 +15,7 @@ class Enfermedad(models.Model):
 	nombre = models.CharField(max_length=30)
 	causas = models.TextField(null=True,blank=True)
 	tratamiento = models.TextField(null=True,blank=True)
-	tipo_enfermedad = models.ForeignKey(TipoEnfermedad,null=True)
+	tipo_enfermedad = models.ForeignKey(TipoEnfermedad,null=True,blank=True)
 
 	def __unicode__(self):
 		return self.nombre
