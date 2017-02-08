@@ -342,7 +342,9 @@
               console.log(enfermedades);
               var str_html = "";
               var cont = 0;
-              if (l>1) str_html = "<p>El resultado de su diagnóstico es el siguiente </p><p>Usted padece las siguientes enfermedades</p><hr>";
+              console.log(l);
+              if (l==0) str_html = "<p>Ninguna enfermedad detectada.</p><hr>";
+              else if (l>1) str_html = "<p>El resultado de su diagnóstico es el siguiente </p><p>Usted padece las siguientes enfermedades</p><hr>";
               else str_html = "<p>El resultado de su diagnóstico es el siguiente </p><hr>";
               for (key in enfermedades) {
                 cont++;

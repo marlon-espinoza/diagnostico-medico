@@ -115,3 +115,11 @@
    =>
    (python-call add_enfermedad 65 "Valvulopatía cardiaca"))
 
+(defrule MAIN::insuficiencia_cardiaca
+   (signo tosFlema)
+   (signo cinetosis)
+   (signo astenia)
+   (signo inapetencia)
+   =>
+   (python-call add_enfermedad 66 "Insuficiencia cardiaca"))
+
